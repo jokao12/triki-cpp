@@ -4,8 +4,7 @@
 Juego de triki (tic-tac-toe) desarrollado en C++ con funcionalidades de guardado y carga de partidas.
 
 ## Integrantes
-- Karen Ortiz - [Lógica del juego y interfaz]
-- Cristian Perez - [Sistema de guardado/carga]
+- Karen Ortiz - [Lógica del juego,Sistema de guardado/carga y interfaz]
 
 ## Características
 - Juego interactivo por consola
