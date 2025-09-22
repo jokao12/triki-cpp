@@ -1,0 +1,34 @@
+# Ejecutables
+*.exe
+*.out
+*.app
+
+# Archivos objeto
+*.o
+*.obj
+
+# Archivos de compilación
+*.dll
+*.so
+*.dylib
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.tmp
+*.temp
+*~
+
+# Carpetas de build
+build/
+bin/
+obj/
+
+# Archivos de VS Code (opcional)
+.vscode/settings.json
+.vscode/c_cpp_properties.json
+
+# Archivos de guardado de prueba (opcional)
+saves/test_*
