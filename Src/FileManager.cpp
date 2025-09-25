@@ -8,7 +8,7 @@
 
 // CONSTRUCTOR POR DEFECTO
 FileManager::FileManager() {
-    // PUNTERO DINÁMICO - Aloca memoria en heap
+    // PUNTERO DINÃMICO - Aloca memoria en heap
     saveDirectory = new std::string("saves");
     maxSavedFiles = 10;
     
@@ -46,9 +46,9 @@ FileManager::FileManager(const FileManager& other) {
               << *saveDirectory << std::endl;
 }
 
-// OPERADOR ASIGNACIÓN (Regla de los 3)
+// OPERADOR ASIGNACIÃ“N (Regla de los 3)
 FileManager& FileManager::operator=(const FileManager& other) {
-    if (this != &other) {  // Evitar auto-asignación
+    if (this != &other) {  // Evitar auto-asignaciÃ³n
         // Liberar memoria actual
         delete saveDirectory;
         
@@ -59,7 +59,7 @@ FileManager& FileManager::operator=(const FileManager& other) {
     return *this;
 }
 
-// MÉTODO PRIVADO - Crear directorio si no existe
+// MÃ‰TODO PRIVADO - Crear directorio si no existe
 bool FileManager::createDirectoryIfNotExists(const std::string& path) {
     try {
         // std::filesystem es C++17, manejo moderno de archivos
@@ -93,7 +93,7 @@ std::vector<std::string> FileManager::listSavedGames() const {
             }
         }
         
-        // Ordenar alfabéticamente
+        // Ordenar alfabÃ©ticamente
         std::sort(gameFiles.begin(), gameFiles.end());
         
     } catch (const std::filesystem::filesystem_error& e) {
@@ -127,7 +127,7 @@ bool FileManager::deleteGame(const std::string& filename) {
     }
 }
 
-// OPTIMIZACIÓN DE MEMORIA - Limpiar archivos antiguos
+// OPTIMIZACIÃ“N DE MEMORIA - Limpiar archivos antiguos
 void FileManager::cleanOldSaves() {
     auto gameFiles = listSavedGames();
     
@@ -137,7 +137,7 @@ void FileManager::cleanOldSaves() {
         return;
     }
     
-    // Ordenar por fecha de modificación (más antiguos primero)
+    // Ordenar por fecha de modificaciÃ³n (mÃ¡s antiguos primero)
     std::vector<std::pair<std::string, std::filesystem::file_time_type>> filesWithTime;
     
     for (const auto& file : gameFiles) {
@@ -146,13 +146,13 @@ void FileManager::cleanOldSaves() {
         filesWithTime.push_back({file, lastWrite});
     }
     
-    // Ordenar por tiempo (más antiguos primero)
+    // Ordenar por tiempo (mÃ¡s antiguos primero)
     std::sort(filesWithTime.begin(), filesWithTime.end(),
               [](const auto& a, const auto& b) {
                   return a.second < b.second;
               });
     
-    // Eliminar archivos más antiguos
+    // Eliminar archivos mÃ¡s antiguos
     int filesToDelete = gameFiles.size() - maxSavedFiles;
     for (int i = 0; i < filesToDelete; i++) {
         deleteGame(filesWithTime[i].first);
@@ -162,12 +162,12 @@ void FileManager::cleanOldSaves() {
               << " archivos antiguos" << std::endl;
 }
 
-// MOSTRAR INFORMACIÓN DEL DIRECTORIO
+// MOSTRAR INFORMACIÃ“N DEL DIRECTORIO
 void FileManager::showDirectoryInfo() const {
-    std::cout << "\n=== INFORMACIÓN DEL FILEMANAGER ===" << std::endl;
+    std::cout << "\n=== INFORMACIÃ“N DEL FILEMANAGER ===" << std::endl;
     std::cout << "Directorio de guardado: " << *saveDirectory << std::endl;
-    std::cout << "Dirección del puntero: " << (void*)saveDirectory << std::endl;
-    std::cout << "Máximo archivos permitidos: " << maxSavedFiles << std::endl;
+    std::cout << "DirecciÃ³n del puntero: " << (void*)saveDirectory << std::endl;
+    std::cout << "MÃ¡ximo archivos permitidos: " << maxSavedFiles << std::endl;
     
     auto files = listSavedGames();
     std::cout << "Archivos encontrados: " << files.size() << std::endl;
@@ -195,12 +195,12 @@ int FileManager::getMaxSavedFiles() const {
 }
 
 void FileManager::setMaxSavedFiles(int maxFiles) {
-    maxSavedFiles = (maxFiles > 0) ? maxFiles : 1;  // Mínimo 1 archivo
+    maxSavedFiles = (maxFiles > 0) ? maxFiles : 1;  // MÃ­nimo 1 archivo
 }
 
-// MÉTODOS ESTÁTICOS - No necesitan instancia de la clase
+// MÃ‰TODOS ESTÃTICOS - No necesitan instancia de la clase
 bool FileManager::isValidFilename(const std::string& filename) {
-    // Verificar que no esté vacío y no contenga caracteres peligrosos
+    // Verificar que no estÃ© vacÃ­o y no contenga caracteres peligrosos
     if (filename.empty() || filename.length() > 100) {
         return false;
     }
