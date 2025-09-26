@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <iostream>
 #include <fstream>
+#include "FileManager.h" 
 
 // Constructor - aloca memoria en el heap
 Game::Game() {
@@ -221,13 +222,151 @@ void Game::playGame() {
 }
 
 bool Game::saveGame(const std::string& filename) const {
-    // Por implementar en siguiente rama
-    return false;
+    // Crear instancia de FileManager
+    FileManager fileManager;
+    
+    // Validar nombre del archivo
+    if (!FileManager::isValidFilename(filename)) {
+        std::cout << "[ERROR] Nombre de archivo inválido: " << filename << std::endl;
+        return false;
+    }
+    
+    // Agregar extension si no la tiene
+    std::string fullFilename = filename;
+    if (fullFilename.find(".triki") == std::string::npos) {
+        fullFilename += ".triki";
+    }
+    
+    // Crear ruta completa
+    std::string fullPath = fileManager.getSaveDirectory() + "/" + fullFilename;
+    
+    // Abrir archivo binario para escritura
+    std::ofstream file(fullPath, std::ios::binary);
+    
+    if (!file.is_open()) {
+        std::cout << "[ERROR] No se pudo crear el archivo: " << fullPath << std::endl;
+        return false;
+    }
+    
+    std::cout << "\n=== GUARDANDO PARTIDA CON PUNTEROS ===" << std::endl;
+    
+    // USO DE PUNTEROS EXPLICITO:
+    // 1. Puntero al tablero (ya lo tenemos)
+    char* boardPtr = board;
+    std::cout << "Direccion del tablero: " << (void*)boardPtr << std::endl;
+    
+    // 2. Punteros a las variables de estado
+    const char* playerPtr = &currentPlayer;
+    const bool* gameEndedPtr = &gameEnded;
+    const char* winnerPtr = &winner;
+    
+    std::cout << "Direccion currentPlayer: " << (void*)playerPtr << std::endl;
+    std::cout << "Direccion gameEnded: " << (void*)gameEndedPtr << std::endl;
+    std::cout << "Direccion winner: " << (void*)winnerPtr << std::endl;
+    
+    // ESCRITURA USANDO ARITMETICA DE PUNTEROS:
+    // Escribir tablero byte por byte
+    for (int i = 0; i < boardSize; i++) {
+        char* currentPos = boardPtr + i;  // Aritmética de punteros
+        file.write(currentPos, sizeof(char));
+        std::cout << "Escribiendo posicion [" << i << "]: '" 
+                  << *currentPos << "' desde " << (void*)currentPos << std::endl;
+    }
+    
+    // Escribir estado usando punteros
+    file.write(playerPtr, sizeof(char));
+    file.write(reinterpret_cast<const char*>(gameEndedPtr), sizeof(bool));
+    file.write(winnerPtr, sizeof(char));
+    
+    file.close();
+    
+    std::cout << "Partida guardada exitosamente: " << fullFilename << std::endl;
+    std::cout << "====================================\n" << std::endl;
+    
+    // Mostrar información del directorio
+    fileManager.showDirectoryInfo();
+    
+    return true;
 }
 
+
+// Implementar loadGame() en Game.cpp
 bool Game::loadGame(const std::string& filename) {
-    // Por implementar en siguiente rama
-    return false;
+    // Crear instancia de FileManager
+    FileManager fileManager;
+    
+    // Validar nombre del archivo
+    if (!FileManager::isValidFilename(filename)) {
+        std::cout << "[ERROR] Nombre de archivo invalido: " << filename << std::endl;
+        return false;
+    }
+    
+    // Agregar extension si no la tiene
+    std::string fullFilename = filename;
+    if (fullFilename.find(".triki") == std::string::npos) {
+        fullFilename += ".triki";
+    }
+    
+    // Verificar que el archivo existe
+    if (!fileManager.fileExists(fullFilename)) {
+        std::cout << "[ERROR] Archivo no encontrado: " << fullFilename << std::endl;
+        return false;
+    }
+    
+    // Crear ruta completa
+    std::string fullPath = fileManager.getSaveDirectory() + "/" + fullFilename;
+    
+    // Abrir archivo binario para lectura
+    std::ifstream file(fullPath, std::ios::binary);
+    
+    if (!file.is_open()) {
+        std::cout << "[ERROR] No se pudo abrir el archivo: " << fullPath << std::endl;
+        return false;
+    }
+    
+    std::cout << "\n=== CARGANDO PARTIDA CON PUNTEROS ===" << std::endl;
+    
+    // USO DE PUNTEROS EXPLICITO PARA LECTURA:
+    // 1. Puntero al tablero para lectura byte por byte
+    char* boardPtr = board;
+    std::cout << "Direccion del tablero para lectura: " << (void*)boardPtr << std::endl;
+    
+    // 2. Punteros a variables de estado
+    char* playerPtr = &currentPlayer;
+    bool* gameEndedPtr = &gameEnded;
+    char* winnerPtr = &winner;
+    
+    std::cout << "Direccion currentPlayer: " << (void*)playerPtr << std::endl;
+    std::cout << "Direccion gameEnded: " << (void*)gameEndedPtr << std::endl;
+    std::cout << "Direccion winner: " << (void*)winnerPtr << std::endl;
+    
+    // LECTURA USANDO ARITMETICA DE PUNTEROS:
+    // Leer tablero byte por byte
+    for (int i = 0; i < boardSize; i++) {
+        char* currentPos = boardPtr + i;  // Aritmetica de punteros
+        file.read(currentPos, sizeof(char));
+        std::cout << "Leyendo posicion [" << i << "]: '" 
+                  << *currentPos << "' en direccion " << (void*)currentPos << std::endl;
+    }
+    
+    // Leer estado usando punteros
+    file.read(playerPtr, sizeof(char));
+    file.read(reinterpret_cast<char*>(gameEndedPtr), sizeof(bool));
+    file.read(winnerPtr, sizeof(char));
+    
+    file.close();
+    
+    std::cout << "Partida cargada exitosamente: " << fullFilename << std::endl;
+    std::cout << "Estado actual:" << std::endl;
+    std::cout << "  - Jugador actual: " << *playerPtr << std::endl;
+    std::cout << "  - Juego terminado: " << (*gameEndedPtr ? "Si" : "No") << std::endl;
+    std::cout << "  - Ganador: " << (*winnerPtr != ' ' ? std::string(1, *winnerPtr) : "Ninguno") << std::endl;
+    std::cout << "===================================\n" << std::endl;
+    
+    // Mostrar tablero cargado
+    displayBoard();
+    
+    return true;
 }
 
 void Game::showMemoryInfo() const {
